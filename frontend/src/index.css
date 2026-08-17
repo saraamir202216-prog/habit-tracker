@@ -1,0 +1,841 @@
+/* ============================================================
+   Habit Tracker — bold color-blocked theme
+   Vivid purple / lime / coral, big rounded headlines, chunky
+   stat cards. Poppins for display type, Inter for body/data.
+   ============================================================ */
+:root {
+  --bg: #F6F5FB;
+  --surface: #FFFFFF;
+  --ink: #14121F;
+  --ink-muted: #6B6980;
+  --border: #E7E4F5;
+
+  --purple: #6E56CF;
+  --purple-dark: #4F3AA8;
+  --purple-tint: #EFEAFD;
+
+  --lime: #C6F135;
+  --lime-dark: #8FAE1F;
+  --lime-ink: #2B3300;
+
+  --coral: #FF6B4A;
+  --coral-dark: #D6482A;
+  --coral-tint: #FFE9E2;
+
+  --success: #35B06E;
+  --danger: #E1432A;
+
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+
+  --font-display: "Poppins", "Segoe UI", sans-serif;
+  --font-body: "Inter", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px 20px 72px;
+  width: 100%;
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+
+.navbar-user {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  padding: 11px 22px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--purple);
+  color: white;
+  box-shadow: 0 4px 0 var(--purple-dark);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 0 var(--purple-dark);
+}
+
+.btn-outline {
+  background: var(--surface);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-muted);
+  border-color: transparent;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-ghost:hover {
+  color: var(--ink);
+}
+
+.btn-success {
+  background: var(--lime);
+  color: var(--lime-ink);
+  box-shadow: 0 4px 0 var(--lime-dark);
+}
+
+.btn-success:hover {
+  box-shadow: 0 6px 0 var(--lime-dark);
+}
+
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--coral-dark);
+  border-color: transparent;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 26px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(20, 18, 31, 0.05);
+}
+
+.card h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-top: 0;
+}
+
+/* ---------- Stats strip (dashboard summary) ---------- */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stat-block {
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.stat-block-purple {
+  background: var(--purple);
+  color: white;
+}
+
+.stat-block-lime {
+  background: var(--lime);
+  color: var(--lime-ink);
+}
+
+.stat-block-coral {
+  background: var(--coral);
+  color: white;
+}
+
+/* ---------- Forms ---------- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 440px;
+  width: 100%;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.form input,
+.form select {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.form input:focus,
+.form select:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ---------- Auth pages ---------- */
+.auth-card {
+  max-width: 400px;
+  width: 100%;
+  margin: 56px auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(110, 86, 207, 0.12);
+}
+
+.auth-card h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.6rem;
+  margin-top: 0;
+}
+
+.auth-switch {
+  margin-top: 18px;
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}
+
+.auth-switch a {
+  color: var(--purple);
+  font-weight: 700;
+}
+
+.page-loading,
+.empty-state {
+  color: var(--ink-muted);
+  text-align: center;
+  padding: 48px 0;
+  font-weight: 600;
+}
+
+/* ---------- Empty state ---------- */
+.empty-state-block {
+  text-align: center;
+  padding: 56px 24px;
+  background: var(--purple-tint);
+  border-radius: var(--radius-lg);
+}
+
+.empty-state-icon {
+  font-size: 1.8rem;
+  color: var(--purple);
+}
+
+.empty-state-block h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin: 10px 0 6px;
+}
+
+.empty-state-block p {
+  color: var(--ink-muted);
+  margin: 0 0 20px;
+}
+
+/* ---------- Page header ---------- */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+/* ---------- Habit list ---------- */
+.habit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.habit-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 2px 10px rgba(20, 18, 31, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.habit-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(110, 86, 207, 0.14);
+}
+
+.habit-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 170px;
+}
+
+.habit-name {
+  font-family: var(--font-display);
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.habit-schedule {
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- Weekly mini bar chart on habit cards ---------- */
+.week-bars {
+  display: flex;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.week-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.week-bar {
+  width: 8px;
+  height: 26px;
+  border-radius: 4px;
+  background: var(--border);
+}
+
+.week-bar-filled {
+  background: var(--lime);
+}
+
+.week-bar-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.habit-card-streaks {
+  display: flex;
+  gap: 8px;
+}
+
+.habit-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---------- Streak badges ---------- */
+.streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--coral-tint);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--coral-dark);
+}
+
+.streak-pill span {
+  font-weight: 500;
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+}
+
+.streak-pill-muted {
+  background: var(--bg);
+  color: var(--ink-muted);
+}
+
+.streak-summary {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* ---------- Habit form specifics ---------- */
+.habit-form {
+  max-width: 100%;
+}
+
+.weekday-picker {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.weekday-chip {
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 8px 13px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.weekday-chip.active {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+}
+
+/* ---------- Recent days strip ---------- */
+.recent-days {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.day-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 58px;
+  padding: 10px 0;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-muted);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.day-toggle.active {
+  background: var(--lime);
+  color: var(--lime-ink);
+  border-color: var(--lime-dark);
+}
+
+.day-toggle-date {
+  font-size: 0.78rem;
+}
+
+.day-toggle-check {
+  font-size: 1rem;
+  height: 1.1rem;
+}
+
+/* ---------- Heatmap ---------- */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 13px);
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.heat-cell {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.heat-done {
+  background: var(--lime);
+}
+
+.heat-missed {
+  background: var(--coral-tint);
+}
+
+.heat-neutral {
+  background: var(--border);
+  opacity: 0.6;
+}
+
+.heat-today {
+  background: var(--surface);
+  box-shadow: 0 0 0 2px var(--purple);
+}
+
+.heat-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.heat-legend .heat-cell {
+  margin-left: 10px;
+}
+
+.heat-legend .heat-cell:first-child {
+  margin-left: 0;
+}
+
+/* ---------- Home / welcome page ---------- */
+.home-hero {
+  text-align: center;
+  padding: 40px 0 28px;
+}
+
+.hero-stamp-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.hero-stamp {
+  width: 84px;
+  height: 84px;
+}
+
+.stamp-ring-outer,
+.stamp-ring-inner {
+  fill: none;
+  stroke: var(--purple);
+  stroke-width: 4;
+}
+
+.stamp-ring-inner {
+  stroke: var(--lime);
+  stroke-width: 3;
+  opacity: 0.8;
+}
+
+.stamp-burst line {
+  stroke: var(--purple);
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0;
+  transform-origin: 80px 80px;
+  animation: stamp-flash 2.6s ease-in-out infinite;
+}
+
+.hero-stamp-wrap svg {
+  animation: stamp-press 2.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes stamp-press {
+  0% { transform: scale(0.85) rotate(-6deg); }
+  8% { transform: scale(1.05) rotate(0deg); }
+  16% { transform: scale(1) rotate(0deg); }
+  70% { transform: scale(1) rotate(0deg); }
+  85% { transform: scale(0.85) rotate(-6deg); }
+  100% { transform: scale(0.85) rotate(-6deg); }
+}
+
+@keyframes stamp-flash {
+  0% { opacity: 0; }
+  14% { opacity: 0; }
+  18% { opacity: 1; }
+  30% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-stamp-wrap svg,
+  .stamp-burst line {
+    animation: none;
+  }
+}
+
+.home-hero h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.5rem;
+  margin-bottom: 14px;
+  letter-spacing: -0.02em;
+}
+
+.home-tagline {
+  color: var(--ink-muted);
+  max-width: 520px;
+  margin: 0 auto 32px;
+  font-size: 1.08rem;
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.home-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 56px;
+}
+
+.home-hero-image {
+  width: 220px;
+  max-width: 100%;
+  margin: 0 auto 48px;
+  display: block;
+}
+
+.home-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  text-align: left;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.home-feature {
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  transition: transform 0.15s ease;
+}
+
+.home-feature:hover {
+  transform: translateY(-4px);
+}
+
+.home-feature:nth-child(1) {
+  background: var(--purple-tint);
+}
+
+.home-feature:nth-child(2) {
+  background: #F1FBD9;
+}
+
+.home-feature:nth-child(3) {
+  background: var(--coral-tint);
+}
+
+.home-feature-icon {
+  font-size: 1.6rem;
+}
+
+.home-feature h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin: 12px 0 6px;
+  font-size: 1.05rem;
+}
+
+.home-feature p {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .container {
+    padding: 24px 16px 56px;
+  }
+
+  .home-hero {
+    padding: 36px 0 16px;
+  }
+
+  .home-hero h1 {
+    font-size: 1.9rem;
+  }
+
+  .streak-summary {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 12px 18px;
+  }
+
+  .navbar-user {
+    display: none;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .stats-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .auth-card {
+    margin: 28px auto;
+    padding: 22px;
+  }
+
+  .habit-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .habit-card-streaks {
+    justify-content: space-between;
+  }
+
+  .habit-card-actions {
+    flex-direction: column;
+  }
+
+  .habit-card-actions .btn {
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .recent-days {
+    justify-content: space-between;
+  }
+
+  .day-toggle {
+    flex: 1 1 40px;
+    width: auto;
+    min-width: 0;
+  }
+
+  .heatmap-grid {
+    grid-template-columns: repeat(auto-fill, 11px);
+  }
+
+  .heat-cell {
+    width: 11px;
+    height: 11px;
+  }
+
+  .home-hero h1 {
+    font-size: 1.6rem;
+  }
+
+  .home-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .home-actions .btn {
+    width: 100%;
+  }
+
+  .home-features {
+    grid-template-columns: 1fr;
+  }
+}
