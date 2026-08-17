@@ -33,12 +33,11 @@ export default function Home() {
           )}
         </div>
       )}
-
-      <img
-        src="/image/Healthy%20mascot.png"
-        alt="Habit tracker mascot"
-        className="home-hero-image"
-      />
+       <img
+  src="/image/mascot.png"
+  alt="Habit tracker mascot"
+  className="home-hero-image"
+/>
 
       <div className="home-features">
         <div className="home-feature">
