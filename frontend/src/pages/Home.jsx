@@ -6,16 +6,7 @@ export default function Home() {
 
   return (
     <div className="home-hero">
-      <div className="hero-stamp-wrap" aria-hidden="true">
-        <svg className="hero-stamp" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-          <g className="stamp-burst">
-            <line x1="80" y1="6" x2="80" y2="20" />
-            <line x1="80" y1="140" x2="80" y2="154" />
-            <line x1="6" y1="80" x2="20" y2="80" />
-            <line x1="140" y1="80" x2="154" y2="80" />
-          </g>
-        </svg>
-      </div>
+      
 
       <h1>Welcome to Habit Tracker</h1>
       <p className="home-tagline">
