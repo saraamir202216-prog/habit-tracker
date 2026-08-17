@@ -93,6 +93,8 @@ body {
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -349,7 +351,6 @@ body {
 }
 
 .habit-card {
-  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 18px 22px;
@@ -360,6 +361,18 @@ body {
   gap: 16px;
   box-shadow: 0 2px 10px rgba(20, 18, 31, 0.05);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.habit-card:nth-child(3n+1) {
+  background: var(--purple-tint);
+}
+
+.habit-card:nth-child(3n+2) {
+  background: #F1FBD9;
+}
+
+.habit-card:nth-child(3n) {
+  background: var(--coral-tint);
 }
 
 .habit-card:hover {
@@ -724,6 +737,62 @@ body {
   font-size: 0.9rem;
   margin: 0;
   line-height: 1.45;
+  font-weight: 500;
+}
+
+/* ---------- How it works ---------- */
+.how-it-works {
+  max-width: 720px;
+  margin: 56px auto 0;
+}
+
+.how-it-works-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  text-align: left;
+}
+
+.how-step {
+  position: relative;
+  padding-top: 8px;
+}
+
+.how-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--purple);
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+.how-step h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0 0 6px;
+}
+
+.how-step p {
+  color: var(--ink-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
   font-weight: 500;
 }
 
