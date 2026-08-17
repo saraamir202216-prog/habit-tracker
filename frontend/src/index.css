@@ -292,6 +292,11 @@ body {
 .auth-switch a {
   color: var(--purple);
   font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
 }
 
 .page-loading,
@@ -757,13 +762,31 @@ body {
 .how-steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
+  gap: 14px;
   text-align: left;
 }
 
 .how-step {
   position: relative;
-  padding-top: 8px;
+  padding: 24px 20px;
+  border-radius: var(--radius-lg);
+  transition: transform 0.15s ease;
+}
+
+.how-step:hover {
+  transform: translateY(-4px);
+}
+
+.how-step:nth-child(1) {
+  background: var(--purple-tint);
+}
+
+.how-step:nth-child(2) {
+  background: #F1FBD9;
+}
+
+.how-step:nth-child(3) {
+  background: var(--coral-tint);
 }
 
 .how-step-num {
