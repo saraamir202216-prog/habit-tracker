@@ -44,7 +44,7 @@ export default function Home() {
       )}
 
       <img
-        src="/image/Healthy%20habit-amico.png"
+        src="/image/Healthy%20mascot.png"
         alt="Habit tracker mascot"
         className="home-hero-image"
       />
