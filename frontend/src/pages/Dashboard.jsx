@@ -146,7 +146,7 @@ export default function Dashboard() {
         <p className="page-loading">Loading...</p>
       ) : habits.length === 0 ? (
         <div className="empty-state-block">
-          <span className="empty-state-icon">✦</span>
+          
           <h2>No habits yet</h2>
           <p>Create your first one below and start building a streak.</p>
           <button className="btn btn-primary" onClick={() => setShowForm(true)}>
