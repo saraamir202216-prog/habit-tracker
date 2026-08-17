@@ -42,17 +42,17 @@ export default function Home() {
 
       <div className="home-features">
         <div className="home-feature">
-          <span className="home-feature-icon">📅</span>
+        
           <h3>Flexible schedules</h3>
           <p>Daily, specific weekdays, or a weekly target — your choice per habit.</p>
         </div>
         <div className="home-feature">
-          <span className="home-feature-icon">🔥</span>
+          
           <h3>Honest streaks</h3>
           <p>Only days your habit is actually expected on count toward your streak.</p>
         </div>
         <div className="home-feature">
-          <span className="home-feature-icon">🗓️</span>
+          
           <h3>Visual history</h3>
           <p>A simple heatmap shows your completion history at a glance.</p>
         </div>
