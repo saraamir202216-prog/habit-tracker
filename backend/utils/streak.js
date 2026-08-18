@@ -2,7 +2,7 @@
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-
+/** Today as "YYYY-MM-DD" (UTC, so the whole app has one consistent clock). */
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -18,11 +18,11 @@ function addDays(dateStr, n) {
 }
 
 function getDayOfWeek(dateStr) {
-  
+  // 0 = Sunday ... 6 = Saturday, matching Habit.days_of_week
   return new Date(dateStr + "T00:00:00.000Z").getUTCDay();
 }
 
-
+/** All "YYYY-MM-DD" strings from start to end inclusive. */
 function dateRange(start, end) {
   const dates = [];
   let cur = start;
@@ -45,16 +45,10 @@ function isExpectedDay(habit, dateStr) {
   if (habit.schedule_type === "specific_days") {
     return (habit.days_of_week || []).includes(getDayOfWeek(dateStr));
   }
-  return false; // weekly_target is handled week-by-week, not day-by-day
+  return false; 
 }
 
-/**
- * SRS 5.1 / 5.2 - daily and specific-weekday habits.
- * Walk every EXPECTED day from habit creation to today. A completed
- * expected day extends the streak; a missed PAST expected day breaks
- * it. Today itself never breaks the streak if not yet logged, because
- * "a day that has not yet occurred [ended] does not break the streak".
- */
+
 function computeDayBasedStreak(habit, completedDates) {
   const completed = new Set(completedDates);
   const start = toDateOnly(habit.created_at);
@@ -62,8 +56,12 @@ function computeDayBasedStreak(habit, completedDates) {
 
   let running = 0;
   let longest = 0;
+  let pendingMissedDate = null;
+  let lastBrokenDate = null;
 
-  if (start > today) return { current_streak: 0, longest_streak: 0 };
+  if (start > today) {
+    return { current_streak: 0, longest_streak: 0, pendingMissedDate, lastBrokenDate };
+  }
 
   for (const date of dateRange(start, today)) {
     if (!isExpectedDay(habit, date)) continue;
@@ -82,12 +80,27 @@ function computeDayBasedStreak(habit, completedDates) {
     if (isDone) {
       running += 1;
       longest = Math.max(longest, running);
-    } else {
-      running = 0; // a past expected day was missed
+      continue;
     }
+
+    // Missed expected day `date`. Its grace window runs through the
+    // following calendar day.
+    const graceDeadline = addDays(date, 1);
+    if (today <= graceDeadline) {
+      // Still within the grace window as of right now - pause here.
+      // We deliberately stop walking forward: we can't yet know
+      // whether this miss will be saved or will break the streak.
+      pendingMissedDate = date;
+      break;
+    }
+
+    // Grace window closed without the day being marked - the streak
+    // breaks here.
+    running = 0;
+    lastBrokenDate = date;
   }
 
-  return { current_streak: running, longest_streak: longest };
+  return { current_streak: running, longest_streak: longest, pendingMissedDate, lastBrokenDate };
 }
 
 /**
@@ -134,7 +147,10 @@ function computeWeeklyTargetStreak(habit, completedDates) {
     longest = Math.max(longest, running);
   }
 
-  return { current_streak: running, longest_streak: longest };
+  // No grace period for weekly-target habits - the trainer explicitly
+  // confirmed a hard Monday-boundary reset with no partial carryover,
+  // so these two fields are always null for this schedule type.
+  return { current_streak: running, longest_streak: longest, pendingMissedDate: null, lastBrokenDate: null };
 }
 
 /**

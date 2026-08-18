@@ -1,8 +1,3 @@
-/* ============================================================
-   Habit Tracker — bold color-blocked theme
-   Vivid purple / lime / coral, big rounded headlines, chunky
-   stat cards. Poppins for display type, Inter for body/data.
-   ============================================================ */
 :root {
   --bg: #F6F5FB;
   --surface: #FFFFFF;
@@ -51,7 +46,6 @@ body {
   width: 100%;
 }
 
-/* ---------- Navbar ---------- */
 .navbar {
   display: flex;
   align-items: center;
@@ -84,7 +78,6 @@ body {
   font-weight: 500;
 }
 
-/* ---------- Buttons ---------- */
 .btn {
   border: 2px solid transparent;
   border-radius: 999px;
@@ -157,7 +150,6 @@ body {
   border-color: transparent;
 }
 
-/* ---------- Cards ---------- */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -174,7 +166,6 @@ body {
   margin-top: 0;
 }
 
-/* ---------- Stats strip (dashboard summary) ---------- */
 .stats-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -218,7 +209,6 @@ body {
   color: white;
 }
 
-/* ---------- Forms ---------- */
 .form {
   display: flex;
   flex-direction: column;
@@ -264,7 +254,6 @@ body {
   gap: 10px;
 }
 
-/* ---------- Auth pages ---------- */
 .auth-card {
   max-width: 400px;
   width: 100%;
@@ -307,7 +296,6 @@ body {
   font-weight: 600;
 }
 
-/* ---------- Empty state ---------- */
 .empty-state-block {
   text-align: center;
   padding: 56px 24px;
@@ -331,7 +319,6 @@ body {
   margin: 0 0 20px;
 }
 
-/* ---------- Page header ---------- */
 .page-header {
   display: flex;
   align-items: center;
@@ -348,7 +335,6 @@ body {
   margin: 0;
 }
 
-/* ---------- Habit list ---------- */
 .habit-list {
   display: flex;
   flex-direction: column;
@@ -408,7 +394,6 @@ body {
   letter-spacing: 0.03em;
 }
 
-/* ---------- Weekly mini bar chart on habit cards ---------- */
 .week-bars {
   display: flex;
   gap: 5px;
@@ -449,7 +434,6 @@ body {
   gap: 8px;
 }
 
-/* ---------- Streak badges ---------- */
 .streak-pill {
   display: inline-flex;
   align-items: center;
@@ -480,7 +464,6 @@ body {
   margin-bottom: 24px;
 }
 
-/* ---------- Habit form specifics ---------- */
 .habit-form {
   max-width: 100%;
 }
@@ -508,7 +491,6 @@ body {
   border-color: var(--purple);
 }
 
-/* ---------- Recent days strip ---------- */
 .recent-days {
   display: flex;
   gap: 8px;
@@ -536,6 +518,75 @@ body {
   border-color: var(--lime-dark);
 }
 
+.day-toggle.locked {
+  background: var(--coral-tint);
+  color: var(--coral-dark);
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.day-toggle.pending {
+  background: #FFF4D6;
+  color: #8A6400;
+  border-color: #E8C158;
+  animation: pulse-glow 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 193, 88, 0.5); }
+  50% { box-shadow: 0 0 0 5px rgba(232, 193, 88, 0); }
+}
+
+.day-toggle:disabled {
+  pointer-events: none;
+}
+
+.recent-days-note {
+  margin: 12px 0 0;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.grace-banner {
+  background: #FFF4D6;
+  border: 1.5px solid #E8C158;
+  color: #6B4E00;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.broken-banner {
+  background: var(--coral-tint);
+  border: 1.5px solid var(--coral);
+  color: var(--coral-dark);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.habit-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.grace-badge {
+  background: #FFF4D6;
+  color: #8A6400;
+  border: 1px solid #E8C158;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .day-toggle-date {
   font-size: 0.78rem;
 }
@@ -545,7 +596,6 @@ body {
   height: 1.1rem;
 }
 
-/* ---------- Heatmap ---------- */
 .heatmap-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, 13px);
@@ -596,7 +646,6 @@ body {
   margin-left: 0;
 }
 
-/* ---------- Home / welcome page ---------- */
 .home-hero {
   text-align: center;
   padding: 40px 0 28px;
@@ -745,7 +794,6 @@ body {
   font-weight: 500;
 }
 
-/* ---------- How it works ---------- */
 .how-it-works {
   max-width: 720px;
   margin: 56px auto 0;
@@ -819,7 +867,6 @@ body {
   font-weight: 500;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
   .container {
     padding: 24px 16px 56px;

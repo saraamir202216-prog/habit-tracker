@@ -8,6 +8,16 @@ function toDateStr(d) {
   return d.toISOString().slice(0, 10);
 }
 
+function todayStr() {
+  return toDateStr(new Date());
+}
+
+function addDaysStr(dateStr, n) {
+  const d = new Date(dateStr + "T00:00:00.000Z");
+  d.setUTCDate(d.getUTCDate() + n);
+  return toDateStr(d);
+}
+
 function lastNDays(n) {
   const out = [];
   const today = new Date();
@@ -17,6 +27,11 @@ function lastNDays(n) {
     out.push(toDateStr(d));
   }
   return out;
+}
+
+function formatFriendly(dateStr) {
+  const d = new Date(dateStr + "T00:00:00.000Z");
+  return d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" });
 }
 
 export default function HabitDetail() {
@@ -48,11 +63,17 @@ export default function HabitDetail() {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   async function toggleDate(dateStr) {
     const isDone = dates.includes(dateStr);
+
+    const graceDeadline = addDaysStr(dateStr, 1);
+    const isLocked = dateStr < todayStr() && !isDone && todayStr() > graceDeadline;
+    if (isLocked) {
+      return;
+    }
+
     try {
       if (isDone) {
         await api.delete(`/habits/${id}/logs/${dateStr}`);
@@ -61,7 +82,7 @@ export default function HabitDetail() {
       }
       await load();
     } catch (err) {
-      setError("Failed to update that day");
+      setError(err.response?.data?.message || "Failed to update that day");
     }
   }
 
@@ -90,6 +111,9 @@ export default function HabitDetail() {
 
   const recentDays = lastNDays(7);
 
+  const showBrokenMessage =
+    habit.lastBrokenDate && addDaysStr(habit.lastBrokenDate, 2) === todayStr();
+
   return (
     <div>
       <button className="btn btn-ghost" onClick={() => navigate("/dashboard")}>
@@ -116,6 +140,20 @@ export default function HabitDetail() {
         </div>
       ) : (
         <>
+          {habit.pendingMissedDate && (
+            <div className="grace-banner">
+              ⏳ You missed <strong>{formatFriendly(habit.pendingMissedDate)}</strong>.
+              Mark it below before the day ends to keep your streak.
+            </div>
+          )}
+
+          {showBrokenMessage && (
+            <div className="broken-banner">
+               Streak broken — you missed <strong>{formatFriendly(habit.lastBrokenDate)}</strong> and
+              didn't catch up in time.
+            </div>
+          )}
+
           <div className="streak-summary">
             <div className="streak-pill">
               🔥 {habit.current_streak} <span>current streak</span>
@@ -128,19 +166,38 @@ export default function HabitDetail() {
           <div className="card">
             <h2>Recent days</h2>
             <div className="recent-days">
-              {recentDays.map((d) => (
-                <button
-                  key={d}
-                  className={`day-toggle ${dates.includes(d) ? "active" : ""}`}
-                  onClick={() => toggleDate(d)}
-                >
-                  <span className="day-toggle-date">{d.slice(5)}</span>
-                  <span className="day-toggle-check">
-                    {dates.includes(d) ? "✓" : ""}
-                  </span>
-                </button>
-              ))}
+              {recentDays.map((d) => {
+                const isDone = dates.includes(d);
+                const graceDeadline = addDaysStr(d, 1);
+                const isPending = d === habit.pendingMissedDate;
+                const isLocked = d < todayStr() && !isDone && todayStr() > graceDeadline;
+                return (
+                  <button
+                    key={d}
+                    className={`day-toggle ${isDone ? "active" : ""} ${
+                      isLocked ? "locked" : ""
+                    } ${isPending ? "pending" : ""}`}
+                    onClick={() => toggleDate(d)}
+                    disabled={isLocked}
+                    title={
+                      isLocked
+                        ? "This day was missed and can no longer be marked"
+                        : isPending
+                        ? "Missed - mark it today to save your streak"
+                        : ""
+                    }
+                  >
+                    <span className="day-toggle-date">{d.slice(5)}</span>
+                    <span className="day-toggle-check">
+                      {isDone ? "✓" : isPending ? "⏳" : isLocked ? "✕" : ""}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
+            <p className="recent-days-note">
+              A missed day gets a 1-day grace period (⏳) - after that it locks for good.
+            </p>
           </div>
 
           <div className="card">

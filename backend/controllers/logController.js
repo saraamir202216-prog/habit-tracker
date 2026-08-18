@@ -7,7 +7,14 @@ async function getOwnedHabit(habitId, userId) {
   return Habit.findOne({ _id: habitId, user_id: userId });
 }
 
-// FR-06: mark a habit completed for a given date (defaults to today)
+function toHabitJSON(habit, pendingMissedDate, lastBrokenDate) {
+  return {
+    ...habit.toObject(),
+    pendingMissedDate,
+    lastBrokenDate,
+  };
+}
+
 async function markDone(req, res) {
   try {
     const habit = await getOwnedHabit(req.params.habitId, req.userId);
@@ -17,7 +24,6 @@ async function markDone(req, res) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(completed_date)) {
       return res.status(400).json({ message: "date must be in YYYY-MM-DD format" });
     }
-    // Assumption (SRS Section 8): no logging future dates
     if (completed_date > todayStr()) {
       return res.status(400).json({ message: "Cannot log a future date" });
     }
@@ -28,14 +34,13 @@ async function markDone(req, res) {
       { upsert: true }
     );
 
-    await withFreshStreak(habit);
-    res.status(201).json({ habit });
+    const { pendingMissedDate, lastBrokenDate } = await withFreshStreak(habit);
+    res.status(201).json({ habit: toHabitJSON(habit, pendingMissedDate, lastBrokenDate) });
   } catch (err) {
     res.status(500).json({ message: "Failed to log habit", error: err.message });
   }
 }
 
-// FR-07: undo / un-mark a completion for a given date
 async function unmarkDone(req, res) {
   try {
     const habit = await getOwnedHabit(req.params.habitId, req.userId);
@@ -44,14 +49,13 @@ async function unmarkDone(req, res) {
     const completed_date = req.params.date;
     await DailyLog.deleteOne({ habit_id: habit._id, completed_date });
 
-    await withFreshStreak(habit);
-    res.json({ habit });
+    const { pendingMissedDate, lastBrokenDate } = await withFreshStreak(habit);
+    res.json({ habit: toHabitJSON(habit, pendingMissedDate, lastBrokenDate) });
   } catch (err) {
     res.status(500).json({ message: "Failed to undo log", error: err.message });
   }
 }
 
-// FR-12 / FR-14: completion history for the calendar/heatmap view
 async function getLogs(req, res) {
   try {
     const habit = await getOwnedHabit(req.params.habitId, req.userId);

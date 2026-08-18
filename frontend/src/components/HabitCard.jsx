@@ -11,21 +11,16 @@ function scheduleLabel(habit) {
 
 const DAY_LETTERS = ["S", "M", "T", "W", "T", "F", "S"];
 
-/** Small 7-bar chart of the last 7 days, echoing the "Stats" bar
- * charts in bold habit-tracker app designs. `week` is a boolean[7]
- * (oldest to newest, ending today). */
-function WeekBars({ week }) {
-  if (!week.length) return null;
-  const today = new Date();
+function WeekBars({ week, dates }) {
+  if (!week.length || !dates.length) return null;
   return (
     <div className="week-bars" aria-hidden="true">
-      {week.map((done, i) => {
-        const d = new Date(today);
-        d.setUTCDate(d.getUTCDate() - (week.length - 1 - i));
+      {dates.map((dateStr, i) => {
+        const dow = new Date(dateStr + "T00:00:00.000Z").getUTCDay();
         return (
-          <div className="week-bar-col" key={i}>
-            <div className={`week-bar ${done ? "week-bar-filled" : ""}`} />
-            <span className="week-bar-label">{DAY_LETTERS[d.getUTCDay()]}</span>
+          <div className="week-bar-col" key={dateStr}>
+            <div className={`week-bar ${week[i] ? "week-bar-filled" : ""}`} />
+            <span className="week-bar-label">{DAY_LETTERS[dow]}</span>
           </div>
         );
       })}
@@ -33,15 +28,29 @@ function WeekBars({ week }) {
   );
 }
 
-export default function HabitCard({ habit, doneToday, week = [], onToggleToday, onDelete }) {
+export default function HabitCard({
+  habit,
+  doneToday,
+  week = [],
+  weekDates = [],
+  onToggleToday,
+  onDelete,
+}) {
   return (
     <div className="habit-card">
       <div className="habit-card-main">
-        <Link to={`/habits/${habit._id}`} className="habit-name">
-          {habit.name}
-        </Link>
+        <div className="habit-name-row">
+          <Link to={`/habits/${habit._id}`} className="habit-name">
+            {habit.name}
+          </Link>
+          {habit.pendingMissedDate && (
+            <span className="grace-badge" title="Missed a day - mark it today to save your streak">
+              ⏳ Grace period
+            </span>
+          )}
+        </div>
         <span className="habit-schedule">{scheduleLabel(habit)}</span>
-        <WeekBars week={week} />
+        <WeekBars week={week} dates={weekDates} />
       </div>
 
       <div className="habit-card-streaks">
