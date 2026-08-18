@@ -33,6 +33,7 @@ export default function HabitCard({
   doneToday,
   week = [],
   weekDates = [],
+  isScheduledToday = true,
   onToggleToday,
   onDelete,
 }) {
@@ -63,12 +64,18 @@ export default function HabitCard({
       </div>
 
       <div className="habit-card-actions">
-        <button
-          className={`btn ${doneToday ? "btn-success" : "btn-outline"}`}
-          onClick={onToggleToday}
-        >
-          {doneToday ? "✓ Done today" : "Mark today done"}
-        </button>
+        {isScheduledToday ? (
+          <button
+            className={`btn ${doneToday ? "btn-success" : "btn-outline"}`}
+            onClick={onToggleToday}
+          >
+            {doneToday ? "✓ Done today" : "Mark today done"}
+          </button>
+        ) : (
+          <button className="btn btn-not-scheduled" disabled title="Not scheduled for today">
+            Not scheduled today
+          </button>
+        )}
         <button className="btn btn-danger-ghost" onClick={onDelete}>
           Delete
         </button>

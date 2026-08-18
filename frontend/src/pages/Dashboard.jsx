@@ -7,6 +7,12 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function isScheduledDay(habit, dateStr) {
+  if (habit.schedule_type !== "specific_days") return true;
+  const dow = new Date(dateStr + "T00:00:00.000Z").getUTCDay();
+  return (habit.days_of_week || []).includes(dow);
+}
+
 function lastNDays(n) {
   const out = [];
   const today = new Date();
@@ -20,8 +26,9 @@ function lastNDays(n) {
 
 export default function Dashboard() {
   const [habits, setHabits] = useState([]);
-  const [doneMap, setDoneMap] = useState({}); // habitId -> boolean (done today)
-  const [weekMap, setWeekMap] = useState({}); // habitId -> boolean[7] (last 7 days)
+  const [doneMap, setDoneMap] = useState({});
+  const [weekMap, setWeekMap] = useState({});
+  const [weekDates, setWeekDates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -35,6 +42,7 @@ export default function Dashboard() {
 
       const today = todayStr();
       const last7 = lastNDays(7);
+      setWeekDates(last7);
 
       const entries = await Promise.all(
         res.data.habits.map(async (h) => {
@@ -76,18 +84,18 @@ export default function Dashboard() {
   }
 
   async function handleToggleToday(habit) {
-    const today = todayStr();
     const isDone = doneMap[habit._id];
+    setError("");
     try {
       if (isDone) {
+        const today = todayStr();
         await api.delete(`/habits/${habit._id}/logs/${today}`);
       } else {
-        await api.post(`/habits/${habit._id}/logs`, { date: today });
+        await api.post(`/habits/${habit._id}/logs`, {});
       }
-      setDoneMap((prev) => ({ ...prev, [habit._id]: !isDone }));
-      await loadHabits(); // refresh streaks
+      await loadHabits();
     } catch (err) {
-      setError("Failed to update today's log");
+      setError(err.response?.data?.message || "Failed to update today's log");
     }
   }
 
@@ -97,7 +105,7 @@ export default function Dashboard() {
       await api.delete(`/habits/${habit._id}`);
       await loadHabits();
     } catch (err) {
-      setError("Failed to delete habit");
+      setError(err.response?.data?.message || "Failed to delete habit");
     }
   }
 
@@ -160,6 +168,8 @@ export default function Dashboard() {
               habit={h}
               doneToday={!!doneMap[h._id]}
               week={weekMap[h._id] || []}
+              weekDates={weekDates}
+              isScheduledToday={isScheduledDay(h, todayStr())}
               onToggleToday={() => handleToggleToday(h)}
               onDelete={() => handleDelete(h)}
             />

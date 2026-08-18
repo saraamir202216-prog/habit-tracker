@@ -150,6 +150,17 @@ body {
   border-color: transparent;
 }
 
+.btn-not-scheduled {
+  background: var(--bg);
+  color: var(--ink-muted);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+
+.btn-not-scheduled:hover {
+  transform: none;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
