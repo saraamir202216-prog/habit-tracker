@@ -206,18 +206,18 @@ body {
 }
 
 .stat-block-purple {
-  background: var(--purple);
-  color: white;
+  background: var(--purple-tint);
+  color: var(--ink);
 }
 
 .stat-block-lime {
-  background: var(--lime);
-  color: var(--lime-ink);
+  background: #F1FBD9;
+  color: var(--ink);
 }
 
 .stat-block-coral {
-  background: var(--coral);
-  color: white;
+  background: var(--coral-tint);
+  color: var(--ink);
 }
 
 .form {
