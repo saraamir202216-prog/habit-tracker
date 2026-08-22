@@ -68,6 +68,13 @@ test("daily: marking TODAY done resolves yesterday's pending grace (the reported
   assert.strictEqual(r.current_streak, 4);
 });
 
+test("daily: brand-new habit's very first-ever missed day still gets a normal grace period", () => {
+  const habit = { schedule_type: "daily", created_at: d(-1) };
+  const dates = [];
+  const r = computeStreaks(habit, dates);
+  assert.strictEqual(r.pendingMissedDate, d(-1), "a habit's first-ever miss should still get grace");
+});
+
 test("daily: consecutive misses after a break don't keep re-triggering grace (trainer's exact scenario)", () => {
   const habit = { schedule_type: "daily", created_at: d(-6) };
   const dates = [d(-6), d(-5), d(-4)];

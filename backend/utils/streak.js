@@ -1,14 +1,3 @@
-/**
- * Streak calculation - the "hard part" described in SRS Section 5 and
- * ERD Section 2. Everything here works with plain "YYYY-MM-DD" strings
- * so we never have to fight timezones. All streaks are recomputed from
- * the FULL log history every time a log is added/removed. That is
- * simpler and safer than trying to patch a running counter, and it
- * guarantees FR-10 for free: the longest streak is just the maximum
- * ever seen while replaying history, so it can never accidentally
- * decrease.
- */
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function todayStr() {
@@ -62,6 +51,7 @@ function computeDayBasedStreak(habit, completedDates) {
   let longest = 0;
   let pendingMissedDate = null;
   let lastBrokenDate = null;
+  let hasProcessedExpectedDay = false;
 
   if (start > today) {
     return { current_streak: 0, longest_streak: 0, pendingMissedDate, lastBrokenDate };
@@ -83,12 +73,15 @@ function computeDayBasedStreak(habit, completedDates) {
     if (isDone) {
       running += 1;
       longest = Math.max(longest, running);
+      hasProcessedExpectedDay = true;
       continue;
     }
 
-    if (running === 0) {
+    if (running === 0 && hasProcessedExpectedDay) {
+      hasProcessedExpectedDay = true;
       continue;
     }
+    hasProcessedExpectedDay = true;
 
     const graceDeadline = addDays(date, 1);
     if (today <= graceDeadline) {
