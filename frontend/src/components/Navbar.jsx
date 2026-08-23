@@ -13,13 +13,10 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <Link to="/" className="brand">
-         Habit Tracker
+        Habit Tracker
       </Link>
       {user && (
         <div className="navbar-right">
-          <Link to="/dashboard" className="btn btn-ghost">
-            Dashboard
-          </Link>
           <span className="navbar-user">Hi, {user.name}</span>
           <button className="btn btn-ghost" onClick={handleLogout}>
             Log out

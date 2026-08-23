@@ -52,6 +52,9 @@ body {
 }
 
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -969,6 +972,7 @@ body {
   height: 12px;
 }
 
+/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
   .container {
     padding: 24px 16px 56px;
@@ -1131,5 +1135,270 @@ body {
 
   .home-features {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Authenticated app shell - sidebar + main content
+   ============================================================ */
+.app-shell {
+  display: flex;
+  align-items: flex-start;
+  /* match the sidebar sticky offset so the shell sits directly under the navbar */
+  min-height: calc(100vh - 56px);
+}
+
+.sidebar {
+  width: 230px;
+  flex-shrink: 0;
+  background: var(--surface);
+  /* make the sidebar visually continuous with the navbar */
+  border-right: none;
+  padding: 16px 28px; /* align inner content with navbar padding */
+  position: sticky;
+  top: 56px; /* stays attached directly under the navbar (matches navbar height) */
+  height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-brand {
+  display: none;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--ink-muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.sidebar-link:hover {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.sidebar-link-active {
+  background: var(--purple-tint);
+  color: var(--purple);
+}
+
+.sidebar-link-icon {
+  font-size: 1.05rem;
+  width: 20px;
+  text-align: center;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  padding: 28px 32px 72px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.analytics-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 140px;
+  margin-top: 8px;
+}
+
+.analytics-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 6px;
+}
+
+.analytics-bar-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: var(--bg);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.analytics-bar-fill {
+  width: 100%;
+  background: var(--purple);
+  border-radius: 6px 6px 0 0;
+  min-height: 0;
+  transition: height 0.2s ease;
+}
+
+.analytics-bar-label {
+  font-size: 0.62rem;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.analytics-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.analytics-table-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 0.7fr 0.7fr 0.7fr;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.analytics-table-row:last-child {
+  border-bottom: none;
+}
+
+.analytics-table-head {
+  font-weight: 700;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 2px solid var(--border);
+}
+
+.analytics-table-name a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-family: var(--font-display);
+}
+
+.analytics-table-name a:hover {
+  color: var(--purple);
+}
+
+.calendar-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.calendar-page-header h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.calendar-page-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px; /* tightened spacing between day cells */
+}
+
+.calendar-page-daylabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+  text-align: center;
+  padding-bottom: 4px;
+}
+
+.calendar-page-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 4px; /* slightly reduced padding for a more compact grid */
+}
+
+.calendar-page-cell-out {
+  opacity: 0.35;
+}
+
+.calendar-page-cell-today {
+  box-shadow: 0 0 0 2px var(--purple);
+}
+
+.calendar-page-daynum {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Ensure the calendar card doesn't feel oversized inside the main area */
+.card > .calendar-page-header + .calendar-page-grid,
+.card > .calendar-page-grid {
+  max-width: 980px;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    padding: 10px 14px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .sidebar-link {
+    white-space: nowrap;
+    padding: 9px 12px;
+  }
+
+  .app-main {
+    padding: 20px 16px 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-table-row {
+    grid-template-columns: 1.4fr 1fr 0.6fr 0.6fr;
+    font-size: 0.8rem;
+  }
+
+  .analytics-table-row span:nth-child(5) {
+    display: none;
+  }
+
+  .analytics-bars {
+    height: 100px;
+  }
+
+  .calendar-page-daynum {
+    font-size: 0.62rem;
+  }
+
+  .sidebar-link span:last-child {
+    font-size: 0.85rem;
   }
 }
