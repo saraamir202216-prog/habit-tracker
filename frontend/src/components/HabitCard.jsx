@@ -34,6 +34,7 @@ export default function HabitCard({
   week = [],
   weekDates = [],
   isScheduledToday = true,
+  isToggling = false,
   onToggleToday,
   onDelete,
 }) {
@@ -68,8 +69,16 @@ export default function HabitCard({
           <button
             className={`btn ${doneToday ? "btn-success" : "btn-outline"}`}
             onClick={onToggleToday}
+            disabled={isToggling}
+            aria-busy={isToggling}
           >
-            {doneToday ? "✓ Done today" : "Mark today done"}
+            {isToggling ? (
+              <span className="btn-loading" aria-label="Saving" />
+            ) : doneToday ? (
+              "✓ Done today"
+            ) : (
+              "Mark today done"
+            )}
           </button>
         ) : (
           <button className="btn btn-not-scheduled" disabled title="Not scheduled for today">

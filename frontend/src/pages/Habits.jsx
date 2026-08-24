@@ -32,6 +32,7 @@ export default function Habits() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [togglingHabitId, setTogglingHabitId] = useState(null);
   const [error, setError] = useState("");
 
   async function loadHabits() {
@@ -85,17 +86,35 @@ export default function Habits() {
 
   async function handleToggleToday(habit) {
     const isDone = doneMap[habit._id];
+    const today = todayStr();
+    setTogglingHabitId(habit._id);
     setError("");
     try {
       if (isDone) {
-        const today = todayStr();
-        await api.delete(`/habits/${habit._id}/logs/${today}`);
+        const res = await api.delete(`/habits/${habit._id}/logs/${today}`);
+        setHabits((current) => current.map((item) => item._id === habit._id ? res.data.habit : item));
+        setDoneMap((current) => ({ ...current, [habit._id]: false }));
+        setWeekMap((current) => ({
+          ...current,
+          [habit._id]: current[habit._id].map((done, index) =>
+            weekDates[index] === today ? false : done
+          ),
+        }));
       } else {
-        await api.post(`/habits/${habit._id}/logs`, {});
+        const res = await api.post(`/habits/${habit._id}/logs`, {});
+        setHabits((current) => current.map((item) => item._id === habit._id ? res.data.habit : item));
+        setDoneMap((current) => ({ ...current, [habit._id]: true }));
+        setWeekMap((current) => ({
+          ...current,
+          [habit._id]: current[habit._id].map((done, index) =>
+            weekDates[index] === today ? true : done
+          ),
+        }));
       }
-      await loadHabits();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update today's log");
+    } finally {
+      setTogglingHabitId(null);
     }
   }
 
@@ -170,6 +189,7 @@ export default function Habits() {
               week={weekMap[h._id] || []}
               weekDates={weekDates}
               isScheduledToday={isScheduledDay(h, todayStr())}
+              isToggling={togglingHabitId === h._id}
               onToggleToday={() => handleToggleToday(h)}
               onDelete={() => handleDelete(h)}
             />
