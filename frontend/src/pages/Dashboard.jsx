@@ -246,7 +246,7 @@ export default function Dashboard() {
           {/* OVERVIEW SUMMARY */}
           <div className="overview-summary">
 
-            {/* ALL HABIT NAMES */}
+            {/* ALL HABITS */}
             <div className="overview-section card">
               <h2>Your Habits</h2>
 
@@ -256,13 +256,16 @@ export default function Dashboard() {
                 {totalHabits === 1 ? "habit" : "habits"}.
               </p>
 
-              <ul className="overview-habit-list">
+              <div className="overview-habit-grid">
                 {habits.map((habit) => (
-                  <li key={habit._id}>
+                  <div
+                    className="overview-habit-card"
+                    key={habit._id}
+                  >
                     {habit.name}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
 
             {/* PENDING TODAY */}
@@ -284,13 +287,16 @@ export default function Dashboard() {
                     to complete today.
                   </p>
 
-                  <ul className="overview-habit-list pending-list">
+                  <div className="overview-habit-grid">
                     {pendingHabits.map((habit) => (
-                      <li key={habit._id}>
+                      <div
+                        className="overview-habit-card"
+                        key={habit._id}
+                      >
                         {habit.name}
-                      </li>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </>
               )}
             </div>

@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/Footer.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import AuthenticatedLayout from "./components/AuthenticatedLayout.jsx";
 import Home from "./pages/Home.jsx";
@@ -11,16 +12,41 @@ import HabitDetail from "./pages/HabitDetail.jsx";
 import CalendarPage from "./pages/CalendarPage.jsx";
 import Analytics from "./pages/Analytics.jsx";
 
-
 export default function App() {
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<main className="container"><Home /></main>} />
-        <Route path="/login" element={<main className="container"><Login /></main>} />
-        <Route path="/register" element={<main className="container"><Register /></main>} />
 
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/"
+          element={
+            <main className="container">
+              <Home />
+            </main>
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <main className="container">
+              <Login />
+            </main>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <main className="container">
+              <Register />
+            </main>
+          }
+        />
+
+        {/* Protected Routes */}
         <Route
           element={
             <PrivateRoute>
@@ -33,11 +59,14 @@ export default function App() {
           <Route path="/habits/:id" element={<HabitDetail />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/analytics" element={<Analytics />} />
-         
         </Route>
 
+        {/* Unknown Route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {/* Footer */}
+      <Footer />
     </>
   );
 }
