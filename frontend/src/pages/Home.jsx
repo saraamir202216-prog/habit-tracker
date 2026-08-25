@@ -184,7 +184,7 @@ export default function Home() {
     <div className="home-page">
       {/* HERO SECTION */}
       <section className="hero-section">
-        <div className="hero-copy">
+        <div className="hero-copy anim-fade-up anim-delay-1">
           <h1 className="hero-heading">
             Build better habits,
             <br />
@@ -208,7 +208,7 @@ export default function Home() {
           )}
         </div>
 
-        <div className="hero-art">
+        <div className="hero-art anim-fade-up anim-delay-2">
           <HeroIllustration />
         </div>
       </section>
@@ -217,7 +217,7 @@ export default function Home() {
       <section className="home-features">
         <Link
           to={user ? "/habits" : "/register"}
-          className="home-feature"
+          className="home-feature anim-fade-up anim-delay-3"
         >
           <span className="home-feature-icon-wrap">
             <span className="home-feature-icon">📅</span>
@@ -241,7 +241,7 @@ export default function Home() {
 
         <Link
           to={user ? "/habits" : "/register"}
-          className="home-feature"
+          className="home-feature anim-fade-up anim-delay-4"
         >
           <span className="home-feature-icon-wrap home-feature-icon-wrap-lime">
             <span className="home-feature-icon">🎯</span>
@@ -265,7 +265,7 @@ export default function Home() {
 
         <Link
           to={user ? "/habits" : "/register"}
-          className="home-feature"
+          className="home-feature anim-fade-up anim-delay-5"
         >
           <span className="home-feature-icon-wrap home-feature-icon-wrap-coral">
             <span className="home-feature-icon">📊</span>
@@ -288,7 +288,7 @@ export default function Home() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="how-it-works-section">
+      <section className="how-it-works-section anim-fade-up anim-delay-6">
         <div className="how-it-works-steps">
           <h2 className="how-it-works-title">How it works</h2>
 

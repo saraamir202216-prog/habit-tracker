@@ -2030,3 +2030,43 @@ body {
     font-size: 0.85rem;
   }
 }
+
+/* ============================================================
+   Landing page entrance animations
+   Elements fade in and slide up slightly as the page loads. A
+   staggered animation-delay (via the .anim-delay-N classes) makes
+   them appear one after another instead of all at once, which reads
+   as much more intentional/polished than everything popping in at
+   the same instant.
+   ============================================================ */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-fade-up {
+  opacity: 0;
+  animation: fade-in-up 0.6s ease forwards;
+}
+
+.anim-delay-1 { animation-delay: 0.05s; }
+.anim-delay-2 { animation-delay: 0.15s; }
+.anim-delay-3 { animation-delay: 0.25s; }
+.anim-delay-4 { animation-delay: 0.35s; }
+.anim-delay-5 { animation-delay: 0.45s; }
+.anim-delay-6 { animation-delay: 0.55s; }
+
+/* Respect users who've asked their OS/browser to reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+}
