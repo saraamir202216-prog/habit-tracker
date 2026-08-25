@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
+/** Original illustration composition (a calendar card + a floating
+ * streak badge) - intentionally simple/abstract shapes rather than a
+ * copied character illustration, since that's someone else's artwork. */
 function HeroIllustration() {
   return (
     <svg viewBox="0 0 420 380" className="hero-illustration" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -93,25 +96,6 @@ export default function Home() {
             weekdays, or X-times-a-week - and see an honest streak that
             actually respects it.
           </p>
-
-          {!loading && (
-            <div className="home-actions">
-              {user ? (
-                <Link to="/dashboard" className="btn btn-primary btn-arrow">
-                  Go to Dashboard <span aria-hidden="true">&rarr;</span>
-                </Link>
-              ) : (
-                <>
-                  <Link to="/register" className="btn btn-primary btn-arrow">
-                    Get started <span aria-hidden="true">&rarr;</span>
-                  </Link>
-                  <Link to="/login" className="btn btn-outline">
-                    Log in
-                  </Link>
-                </>
-              )}
-            </div>
-          )}
         </div>
         <div className="hero-art">
           <HeroIllustration />
@@ -119,7 +103,7 @@ export default function Home() {
       </section>
 
       <section className="home-features">
-        <Link to={user ? "/dashboard" : "/register"} className="home-feature">
+        <Link to={user ? "/habits" : "/register"} className="home-feature">
           <span className="home-feature-icon-wrap">
             <span className="home-feature-icon">📅</span>
           </span>
@@ -129,7 +113,7 @@ export default function Home() {
           </div>
           <span className="home-feature-chevron" aria-hidden="true">&rsaquo;</span>
         </Link>
-        <Link to={user ? "/dashboard" : "/register"} className="home-feature">
+        <Link to={user ? "/habits" : "/register"} className="home-feature">
           <span className="home-feature-icon-wrap home-feature-icon-wrap-lime">
             <span className="home-feature-icon">🎯</span>
           </span>
@@ -139,7 +123,7 @@ export default function Home() {
           </div>
           <span className="home-feature-chevron" aria-hidden="true">&rsaquo;</span>
         </Link>
-        <Link to={user ? "/dashboard" : "/register"} className="home-feature">
+        <Link to={user ? "/habits" : "/register"} className="home-feature">
           <span className="home-feature-icon-wrap home-feature-icon-wrap-coral">
             <span className="home-feature-icon">📊</span>
           </span>
