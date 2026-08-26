@@ -13,7 +13,7 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <Link to="/" className="brand">
-        🔥 Habit Tracker
+         Habit Tracker
       </Link>
 
       {!loading && (
