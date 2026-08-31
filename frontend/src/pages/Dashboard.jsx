@@ -7,9 +7,13 @@ function todayStr() {
 }
 
 function isScheduledDay(habit, dateStr) {
-  if (habit.schedule_type !== "specific_days") return true;
+  if (habit.schedule_type !== "specific_days") {
+    return true;
+  }
 
-  const dow = new Date(dateStr + "T00:00:00.000Z").getUTCDay();
+  const dow = new Date(
+    dateStr + "T00:00:00.000Z"
+  ).getUTCDay();
 
   return (habit.days_of_week || []).includes(dow);
 }
@@ -20,8 +24,12 @@ function lastNDays(n) {
 
   for (let i = n - 1; i >= 0; i--) {
     const d = new Date(today);
+
     d.setUTCDate(d.getUTCDate() - i);
-    out.push(d.toISOString().slice(0, 10));
+
+    out.push(
+      d.toISOString().slice(0, 10)
+    );
   }
 
   return out;
@@ -42,9 +50,16 @@ export default function Dashboard() {
     setError("");
 
     try {
+      /*
+       * ONE request only.
+       *
+       * Backend now sends habits together with
+       * the recent log dates.
+       */
       const res = await api.get("/habits");
 
-      const loadedHabits = res.data.habits || [];
+      const loadedHabits =
+        res.data.habits || [];
 
       setHabits(loadedHabits);
 
@@ -53,34 +68,54 @@ export default function Dashboard() {
 
       setWeekDates(last7);
 
-      const entries = await Promise.all(
-        loadedHabits.map(async (h) => {
-          const logRes = await api.get(`/habits/${h._id}/logs`);
-
-          const dates = new Set(logRes.data.dates);
+      /*
+       * No /logs request here.
+       *
+       * We use the logDates already returned
+       * by the backend.
+       */
+      const entries = loadedHabits.map(
+        (habit) => {
+          const dates = new Set(
+            habit.logDates || []
+          );
 
           return {
-            id: h._id,
-            doneToday: dates.has(today),
-            week: last7.map((d) => dates.has(d)),
+            id: habit._id,
+
+            doneToday:
+              dates.has(today),
+
+            week: last7.map(
+              (date) => dates.has(date)
+            ),
           };
-        })
+        }
       );
 
       setDoneMap(
         Object.fromEntries(
-          entries.map((entry) => [entry.id, entry.doneToday])
+          entries.map((entry) => [
+            entry.id,
+            entry.doneToday,
+          ])
         )
       );
 
       setWeekMap(
         Object.fromEntries(
-          entries.map((entry) => [entry.id, entry.week])
+          entries.map((entry) => [
+            entry.id,
+            entry.week,
+          ])
         )
       );
     } catch (err) {
       console.error(err);
-      setError("Failed to load habits");
+
+      setError(
+        "Failed to load habits"
+      );
     } finally {
       setLoading(false);
     }
@@ -95,14 +130,18 @@ export default function Dashboard() {
     setError("");
 
     try {
-      await api.post("/habits", payload);
+      await api.post(
+        "/habits",
+        payload
+      );
 
       setShowForm(false);
 
       await loadHabits();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to create habit"
+        err.response?.data?.message ||
+          "Failed to create habit"
       );
     } finally {
       setBusy(false);
@@ -119,42 +158,62 @@ export default function Dashboard() {
     }
 
     try {
-      await api.delete(`/habits/${habit._id}`);
+      await api.delete(
+        `/habits/${habit._id}`
+      );
 
       await loadHabits();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to delete habit"
+        err.response?.data?.message ||
+          "Failed to delete habit"
       );
     }
   }
 
-  const totalHabits = habits.length;
+  const totalHabits =
+    habits.length;
 
-  const today = todayStr();
+  const today =
+    todayStr();
 
-  /*
-   * Habits that are scheduled for today
-   * but have not been completed yet.
-   */
-  const pendingHabits = habits.filter((habit) => {
-    const scheduledToday = isScheduledDay(habit, today);
-    const completedToday = !!doneMap[habit._id];
+  const pendingHabits =
+    habits.filter((habit) => {
+      const scheduledToday =
+        isScheduledDay(
+          habit,
+          today
+        );
 
-    return scheduledToday && !completedToday;
-  });
+      const completedToday =
+        !!doneMap[habit._id];
 
-  const activeStreaks = habits.filter(
-    (habit) => habit.current_streak > 0
-  ).length;
+      return (
+        scheduledToday &&
+        !completedToday
+      );
+    });
 
-  const weekCells = Object.values(weekMap).flat();
+  const activeStreaks =
+    habits.filter(
+      (habit) =>
+        habit.current_streak > 0
+    ).length;
 
-  const weekPercent = weekCells.length
-    ? Math.round(
-        (weekCells.filter(Boolean).length / weekCells.length) * 100
-      )
-    : 0;
+  const weekCells =
+    Object.values(
+      weekMap
+    ).flat();
+
+  const weekPercent =
+    weekCells.length
+      ? Math.round(
+          (weekCells.filter(Boolean)
+            .length /
+            weekCells.length) *
+            100
+        )
+      : 0;
 
   return (
     <div>
@@ -164,20 +223,29 @@ export default function Dashboard() {
           <h1>Overview</h1>
 
           <p className="page-subtitle">
-            Here's a quick look at your habits and today's progress.
+            Here's a quick look at your
+            habits and today's progress.
           </p>
         </div>
 
         <button
           className="btn btn-primary"
-          onClick={() => setShowForm((s) => !s)}
+          onClick={() =>
+            setShowForm((s) => !s)
+          }
         >
-          {showForm ? "Close" : "+ New habit"}
+          {showForm
+            ? "Close"
+            : "+ New habit"}
         </button>
       </div>
 
       {/* ERROR */}
-      {error && <p className="form-error">{error}</p>}
+      {error && (
+        <p className="form-error">
+          {error}
+        </p>
+      )}
 
       {/* CREATE HABIT FORM */}
       {showForm && (
@@ -191,19 +259,23 @@ export default function Dashboard() {
 
       {/* LOADING */}
       {loading ? (
-        <p className="page-loading">Loading...</p>
+        <p className="page-loading">
+          Loading...
+        </p>
       ) : habits.length === 0 ? (
-        /* EMPTY STATE */
         <div className="empty-state-block">
           <h2>No habits yet</h2>
 
           <p>
-            Create your first one below and start building a streak.
+            Create your first one below
+            and start building a streak.
           </p>
 
           <button
             className="btn btn-primary"
-            onClick={() => setShowForm(true)}
+            onClick={() =>
+              setShowForm(true)
+            }
           >
             + New habit
           </button>
@@ -245,62 +317,77 @@ export default function Dashboard() {
 
           {/* OVERVIEW SUMMARY */}
           <div className="overview-summary">
-
             {/* ALL HABITS */}
             <div className="overview-section card">
               <h2>Your Habits</h2>
 
               <p>
                 You currently have{" "}
-                <strong>{totalHabits}</strong>{" "}
-                {totalHabits === 1 ? "habit" : "habits"}.
+                <strong>
+                  {totalHabits}
+                </strong>{" "}
+                {totalHabits === 1
+                  ? "habit"
+                  : "habits"}.
               </p>
 
               <div className="overview-habit-grid">
-                {habits.map((habit) => (
-                  <div
-                    className="overview-habit-card"
-                    key={habit._id}
-                  >
-                    {habit.name}
-                  </div>
-                ))}
+                {habits.map(
+                  (habit) => (
+                    <div
+                      className="overview-habit-card"
+                      key={habit._id}
+                    >
+                      {habit.name}
+                    </div>
+                  )
+                )}
               </div>
             </div>
 
             {/* PENDING TODAY */}
             <div className="overview-section card">
-              <h2>Pending Today</h2>
+              <h2>
+                Pending Today
+              </h2>
 
-              {pendingHabits.length === 0 ? (
+              {pendingHabits.length ===
+              0 ? (
                 <p className="overview-success">
-                  All caught up! No pending habits for today.
+                  All caught up! No pending
+                  habits for today.
                 </p>
               ) : (
                 <>
                   <p>
                     You still have{" "}
-                    <strong>{pendingHabits.length}</strong>{" "}
-                    {pendingHabits.length === 1
+                    <strong>
+                      {
+                        pendingHabits.length
+                      }
+                    </strong>{" "}
+                    {pendingHabits.length ===
+                    1
                       ? "habit"
                       : "habits"}{" "}
                     to complete today.
                   </p>
 
                   <div className="overview-habit-grid">
-                    {pendingHabits.map((habit) => (
-                      <div
-                        className="overview-habit-card"
-                        key={habit._id}
-                      >
-                        {habit.name}
-                      </div>
-                    ))}
+                    {pendingHabits.map(
+                      (habit) => (
+                        <div
+                          className="overview-habit-card"
+                          key={habit._id}
+                        >
+                          {habit.name}
+                        </div>
+                      )
+                    )}
                   </div>
                 </>
               )}
             </div>
-
           </div>
         </>
       )}
