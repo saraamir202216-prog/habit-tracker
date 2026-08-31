@@ -10,145 +10,342 @@ function todayStr() {
 }
 
 const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function buildMonthGrid(year, month) {
-  const firstOfMonth = new Date(Date.UTC(year, month, 1));
-  const firstWeekday = firstOfMonth.getUTCDay();
-  const leadingBlanks = firstWeekday === 0 ? 6 : firstWeekday - 1;
+  const firstOfMonth = new Date(
+    Date.UTC(year, month, 1)
+  );
+
+  const firstWeekday =
+    firstOfMonth.getUTCDay();
+
+  const leadingBlanks =
+    firstWeekday === 0
+      ? 6
+      : firstWeekday - 1;
 
   const start = new Date(firstOfMonth);
-  start.setUTCDate(start.getUTCDate() - leadingBlanks);
+
+  start.setUTCDate(
+    start.getUTCDate() -
+      leadingBlanks
+  );
 
   const cells = [];
+
   for (let i = 0; i < 42; i++) {
     const d = new Date(start);
-    d.setUTCDate(d.getUTCDate() + i);
+
+    d.setUTCDate(
+      d.getUTCDate() + i
+    );
+
     cells.push({
       dateStr: toDateStr(d),
       day: d.getUTCDate(),
-      inMonth: d.getUTCMonth() === month,
+      inMonth:
+        d.getUTCMonth() === month,
     });
   }
+
   return cells;
 }
 
 export default function CalendarPage() {
-  const [habits, setHabits] = useState([]);
-  const [countsByDate, setCountsByDate] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [habits, setHabits] =
+    useState([]);
+
+  const [countsByDate, setCountsByDate] =
+    useState({});
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
 
   const now = new Date();
-  const [year, setYear] = useState(now.getUTCFullYear());
-  const [month, setMonth] = useState(now.getUTCMonth());
 
+  const [year, setYear] = useState(
+    now.getUTCFullYear()
+  );
+
+  const [month, setMonth] = useState(
+    now.getUTCMonth()
+  );
+
+  /*
+   * Load calendar data.
+   *
+   * IMPORTANT:
+   * Only ONE API request is made.
+   *
+   * The /habits endpoint already returns
+   * recent logDates for all habits.
+   */
   useEffect(() => {
     async function load() {
       setLoading(true);
-      try {
-        const res = await api.get("/habits");
-        setHabits(res.data.habits);
+      setError("");
 
-        const entries = await Promise.all(
-          res.data.habits.map((h) => api.get(`/habits/${h._id}/logs`))
+      try {
+        const res =
+          await api.get("/habits");
+
+        const loadedHabits =
+          res.data.habits || [];
+
+        setHabits(
+          loadedHabits
         );
+
+        /*
+         * Build completion counts from
+         * logDates returned with habits.
+         */
         const counts = {};
-        entries.forEach((logRes) => {
-          logRes.data.dates.forEach((dateStr) => {
-            counts[dateStr] = (counts[dateStr] || 0) + 1;
-          });
-        });
-        setCountsByDate(counts);
+
+        loadedHabits.forEach(
+          (habit) => {
+            const dates =
+              habit.logDates || [];
+
+            dates.forEach(
+              (dateStr) => {
+                counts[dateStr] =
+                  (counts[dateStr] || 0) +
+                  1;
+              }
+            );
+          }
+        );
+
+        setCountsByDate(
+          counts
+        );
       } catch (err) {
-        setError("Failed to load calendar data");
+        console.error(
+          "Failed to load calendar:",
+          err
+        );
+
+        setError(
+          "Failed to load calendar data"
+        );
       } finally {
         setLoading(false);
       }
     }
+
     load();
   }, []);
 
   function prevMonth() {
     if (month === 0) {
       setMonth(11);
-      setYear((y) => y - 1);
+      setYear(
+        (y) => y - 1
+      );
     } else {
-      setMonth((m) => m - 1);
+      setMonth(
+        (m) => m - 1
+      );
     }
   }
 
   function nextMonth() {
     if (month === 11) {
       setMonth(0);
-      setYear((y) => y + 1);
+      setYear(
+        (y) => y + 1
+      );
     } else {
-      setMonth((m) => m + 1);
+      setMonth(
+        (m) => m + 1
+      );
     }
   }
 
-  const cells = buildMonthGrid(year, month);
-  const today = todayStr();
-  const maxCount = Math.max(1, habits.length);
+  const cells =
+    buildMonthGrid(
+      year,
+      month
+    );
+
+  const today =
+    todayStr();
+
+  const maxCount =
+    Math.max(
+      1,
+      habits.length
+    );
 
   function levelFor(count) {
-    if (count === 0) return 0;
-    const ratio = count / maxCount;
-    if (ratio >= 0.75) return 4;
-    if (ratio >= 0.5) return 3;
-    if (ratio >= 0.25) return 2;
+    if (count === 0) {
+      return 0;
+    }
+
+    const ratio =
+      count / maxCount;
+
+    if (ratio >= 0.75) {
+      return 4;
+    }
+
+    if (ratio >= 0.5) {
+      return 3;
+    }
+
+    if (ratio >= 0.25) {
+      return 2;
+    }
+
     return 1;
   }
 
   return (
     <div>
+      {/* PAGE HEADER */}
       <div className="page-header">
         <h1>Calendar</h1>
       </div>
 
-      {error && <p className="form-error">{error}</p>}
+      {/* ERROR */}
+      {error && (
+        <p className="form-error">
+          {error}
+        </p>
+      )}
 
       <div className="card">
+        {/* MONTH HEADER */}
         <div className="calendar-page-header">
-          <button className="btn btn-ghost" onClick={prevMonth}>&larr;</button>
-          <h2>{MONTH_NAMES[month]} {year}</h2>
-          <button className="btn btn-ghost" onClick={nextMonth}>&rarr;</button>
+          <button
+            className="btn btn-ghost"
+            onClick={prevMonth}
+          >
+            &larr;
+          </button>
+
+          <h2>
+            {MONTH_NAMES[month]}{" "}
+            {year}
+          </h2>
+
+          <button
+            className="btn btn-ghost"
+            onClick={nextMonth}
+          >
+            &rarr;
+          </button>
         </div>
 
+        {/* LOADING */}
         {loading ? (
-          <p className="page-loading">Loading...</p>
+          <p className="page-loading">
+            Loading...
+          </p>
         ) : (
           <>
+            {/* CALENDAR */}
             <div className="calendar-page-grid">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-                <span className="calendar-page-daylabel" key={d}>{d}</span>
+              {[
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun",
+              ].map((d) => (
+                <span
+                  className="calendar-page-daylabel"
+                  key={d}
+                >
+                  {d}
+                </span>
               ))}
-              {cells.map((cell) => {
-                const count = countsByDate[cell.dateStr] || 0;
-                const level = levelFor(count);
-                return (
-                  <div
-                    key={cell.dateStr}
-                    className={`calendar-page-cell level-${level} ${
-                      cell.inMonth ? "" : "calendar-page-cell-out"
-                    } ${cell.dateStr === today ? "calendar-page-cell-today" : ""}`}
-                    title={count > 0 ? `${cell.dateStr}: ${count} habit${count === 1 ? "" : "s"} completed` : cell.dateStr}
-                  >
-                    <span className="calendar-page-daynum">{cell.day}</span>
-                  </div>
-                );
-              })}
+
+              {cells.map(
+                (cell) => {
+                  const count =
+                    countsByDate[
+                      cell.dateStr
+                    ] || 0;
+
+                  const level =
+                    levelFor(
+                      count
+                    );
+
+                  return (
+                    <div
+                      key={
+                        cell.dateStr
+                      }
+                      className={`calendar-page-cell level-${level} ${
+                        cell.inMonth
+                          ? ""
+                          : "calendar-page-cell-out"
+                      } ${
+                        cell.dateStr ===
+                        today
+                          ? "calendar-page-cell-today"
+                          : ""
+                      }`}
+                      title={
+                        count > 0
+                          ? `${cell.dateStr}: ${count} habit${
+                              count === 1
+                                ? ""
+                                : "s"
+                            } completed`
+                          : cell.dateStr
+                      }
+                    >
+                      <span className="calendar-page-daynum">
+                        {cell.day}
+                      </span>
+                    </div>
+                  );
+                }
+              )}
             </div>
-            <div className="calendar-demo-legend" style={{ marginTop: 14 }}>
-              <span>Less</span>
+
+            {/* LEGEND */}
+            <div
+              className="calendar-demo-legend"
+              style={{
+                marginTop: 14,
+              }}
+            >
+              <span>
+                Less
+              </span>
+
               <span className="calendar-demo-cell level-0" />
               <span className="calendar-demo-cell level-1" />
               <span className="calendar-demo-cell level-2" />
               <span className="calendar-demo-cell level-3" />
               <span className="calendar-demo-cell level-4" />
-              <span>More</span>
+
+              <span>
+                More
+              </span>
             </div>
           </>
         )}
