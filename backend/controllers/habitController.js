@@ -5,12 +5,19 @@ const { computeStreaks } = require("../utils/streak");
 function validateSchedule(body) {
   const { schedule_type, days_of_week, target_count } = body;
 
-  if (!["daily", "specific_days", "weekly_target"].includes(schedule_type)) {
+  if (
+    !["daily", "specific_days", "weekly_target"].includes(
+      schedule_type
+    )
+  ) {
     return "schedule_type must be daily, specific_days, or weekly_target";
   }
 
   if (schedule_type === "specific_days") {
-    if (!Array.isArray(days_of_week) || days_of_week.length === 0) {
+    if (
+      !Array.isArray(days_of_week) ||
+      days_of_week.length === 0
+    ) {
       return "days_of_week must be a non-empty array (0=Sun..6=Sat) for specific_days habits";
     }
   }
@@ -28,17 +35,16 @@ function validateSchedule(body) {
   return null;
 }
 
-/*
- * Optimized version:
- * Instead of querying DailyLog separately for every habit,
- * we fetch all logs for all the user's habits in ONE query.
- */
 async function withFreshStreak(habit) {
-  const logs = await DailyLog.find({ habit_id: habit._id })
+  const logs = await DailyLog.find({
+    habit_id: habit._id,
+  })
     .select("completed_date -_id")
     .lean();
 
-  const dates = logs.map((log) => log.completed_date);
+  const dates = logs.map(
+    (log) => log.completed_date
+  );
 
   const {
     current_streak,
@@ -47,12 +53,32 @@ async function withFreshStreak(habit) {
     lastBrokenDate,
   } = computeStreaks(habit, dates);
 
+  /*
+   * DEBUG:
+   * Shows the actual habit information and the
+   * values being used to calculate the streak.
+   */
+  console.log("STREAK DEBUG:", {
+    habit: habit.name,
+    schedule_type: habit.schedule_type,
+    days_of_week: habit.days_of_week,
+    created_at: habit.created_at,
+    today: new Date().toISOString().slice(0, 10),
+    dates,
+    current_streak,
+    longest_streak,
+  });
+
+  /*
+   * Keep the stored streak values updated.
+   */
   if (
     habit.current_streak !== current_streak ||
     habit.longest_streak !== longest_streak
   ) {
     habit.current_streak = current_streak;
     habit.longest_streak = longest_streak;
+
     await habit.save();
   }
 
@@ -60,27 +86,40 @@ async function withFreshStreak(habit) {
     habit,
     pendingMissedDate,
     lastBrokenDate,
+    logDates: dates,
+    current_streak,
+    longest_streak,
   };
 }
 
-/*
- * Convert habit to JSON response.
- */
-function toHabitJSON(habit, pendingMissedDate, lastBrokenDate) {
+function toHabitJSON(
+  habit,
+  pendingMissedDate,
+  lastBrokenDate,
+  logDates = [],
+  current_streak = habit.current_streak,
+  longest_streak = habit.longest_streak
+) {
   return {
     ...habit.toObject(),
+
+    current_streak,
+    longest_streak,
+
     pendingMissedDate,
     lastBrokenDate,
+    logDates,
   };
 }
 
-// FR-03 / FR-04: create a habit
 async function createHabit(req, res) {
   try {
     const error = validateSchedule(req.body);
 
     if (error) {
-      return res.status(400).json({ message: error });
+      return res.status(400).json({
+        message: error,
+      });
     }
 
     const {
@@ -100,16 +139,34 @@ async function createHabit(req, res) {
       user_id: req.userId,
       name: name.trim(),
       schedule_type,
+
       days_of_week:
-        schedule_type === "specific_days" ? days_of_week : [],
+        schedule_type === "specific_days"
+          ? days_of_week
+          : [],
+
       target_count:
-        schedule_type === "weekly_target" ? target_count : null,
+        schedule_type === "weekly_target"
+          ? target_count
+          : null,
     });
 
     res.status(201).json({
-      habit: toHabitJSON(habit, null, null),
+      habit: toHabitJSON(
+        habit,
+        null,
+        null,
+        [],
+        0,
+        0
+      ),
     });
   } catch (err) {
+    console.error(
+      "Failed to create habit:",
+      err
+    );
+
     res.status(500).json({
       message: "Failed to create habit",
       error: err.message,
@@ -117,10 +174,8 @@ async function createHabit(req, res) {
   }
 }
 
-// Optimized list habits
 async function listHabits(req, res) {
   try {
-    // Query 1: Get all habits for the logged-in user
     const habits = await Habit.find({
       user_id: req.userId,
     })
@@ -128,56 +183,83 @@ async function listHabits(req, res) {
       .lean();
 
     if (habits.length === 0) {
-      return res.json({ habits: [] });
+      return res.json({
+        habits: [],
+      });
     }
 
-    // Get all habit IDs
-    const habitIds = habits.map((habit) => habit._id);
+    const habitIds = habits.map(
+      (habit) => habit._id
+    );
 
-    // Query 2: Get ALL logs for these habits in one query
     const logs = await DailyLog.find({
-      habit_id: { $in: habitIds },
+      habit_id: {
+        $in: habitIds,
+      },
     })
-      .select("habit_id completed_date -_id")
+      .select(
+        "habit_id completed_date -_id"
+      )
       .lean();
 
-    // Group logs by habit
     const logsByHabit = new Map();
 
     for (const log of logs) {
-      const habitId = log.habit_id.toString();
+      const habitId =
+        log.habit_id.toString();
 
       if (!logsByHabit.has(habitId)) {
-        logsByHabit.set(habitId, []);
+        logsByHabit.set(
+          habitId,
+          []
+        );
       }
 
-      logsByHabit.get(habitId).push(log.completed_date);
+      logsByHabit
+        .get(habitId)
+        .push(log.completed_date);
     }
 
-    // Calculate streaks without making more database queries
-    const fresh = habits.map((habit) => {
-      const dates = logsByHabit.get(habit._id.toString()) || [];
+    const fresh = habits.map(
+      (habit) => {
+        const dates =
+          logsByHabit.get(
+            habit._id.toString()
+          ) || [];
 
-      const {
-        current_streak,
-        longest_streak,
-        pendingMissedDate,
-        lastBrokenDate,
-      } = computeStreaks(habit, dates);
+        const {
+          current_streak,
+          longest_streak,
+          pendingMissedDate,
+          lastBrokenDate,
+        } = computeStreaks(
+          habit,
+          dates
+        );
 
-      return {
-        ...habit,
-        current_streak,
-        longest_streak,
-        pendingMissedDate,
-        lastBrokenDate,
-      };
-    });
+        return {
+          ...habit,
+
+          current_streak,
+          longest_streak,
+
+          pendingMissedDate,
+          lastBrokenDate,
+
+          logDates: dates,
+        };
+      }
+    );
 
     res.json({
       habits: fresh,
     });
   } catch (err) {
+    console.error(
+      "Failed to load habits:",
+      err
+    );
+
     res.status(500).json({
       message: "Failed to load habits",
       error: err.message,
@@ -185,13 +267,13 @@ async function listHabits(req, res) {
   }
 }
 
-// Get one habit
 async function getHabit(req, res) {
   try {
-    const habit = await Habit.findOne({
-      _id: req.params.id,
-      user_id: req.userId,
-    });
+    const habit =
+      await Habit.findOne({
+        _id: req.params.id,
+        user_id: req.userId,
+      });
 
     if (!habit) {
       return res.status(404).json({
@@ -202,16 +284,29 @@ async function getHabit(req, res) {
     const {
       pendingMissedDate,
       lastBrokenDate,
-    } = await withFreshStreak(habit);
+      logDates,
+      current_streak,
+      longest_streak,
+    } = await withFreshStreak(
+      habit
+    );
 
     res.json({
       habit: toHabitJSON(
         habit,
         pendingMissedDate,
-        lastBrokenDate
+        lastBrokenDate,
+        logDates,
+        current_streak,
+        longest_streak
       ),
     });
   } catch (err) {
+    console.error(
+      "Failed to load habit:",
+      err
+    );
+
     res.status(500).json({
       message: "Failed to load habit",
       error: err.message,
@@ -219,13 +314,13 @@ async function getHabit(req, res) {
   }
 }
 
-// FR-05: update habit
 async function updateHabit(req, res) {
   try {
-    const habit = await Habit.findOne({
-      _id: req.params.id,
-      user_id: req.userId,
-    });
+    const habit =
+      await Habit.findOne({
+        _id: req.params.id,
+        user_id: req.userId,
+      });
 
     if (!habit) {
       return res.status(404).json({
@@ -238,7 +333,8 @@ async function updateHabit(req, res) {
       ...req.body,
     };
 
-    const error = validateSchedule(merged);
+    const error =
+      validateSchedule(merged);
 
     if (error) {
       return res.status(400).json({
@@ -247,19 +343,26 @@ async function updateHabit(req, res) {
     }
 
     if (req.body.name !== undefined) {
-      habit.name = req.body.name.trim();
+      habit.name =
+        req.body.name.trim();
     }
 
-    if (req.body.schedule_type !== undefined) {
-      habit.schedule_type = req.body.schedule_type;
+    if (
+      req.body.schedule_type !==
+      undefined
+    ) {
+      habit.schedule_type =
+        req.body.schedule_type;
 
       habit.days_of_week =
-        req.body.schedule_type === "specific_days"
+        req.body.schedule_type ===
+        "specific_days"
           ? req.body.days_of_week || []
           : [];
 
       habit.target_count =
-        req.body.schedule_type === "weekly_target"
+        req.body.schedule_type ===
+        "weekly_target"
           ? req.body.target_count
           : null;
     }
@@ -269,16 +372,29 @@ async function updateHabit(req, res) {
     const {
       pendingMissedDate,
       lastBrokenDate,
-    } = await withFreshStreak(habit);
+      logDates,
+      current_streak,
+      longest_streak,
+    } = await withFreshStreak(
+      habit
+    );
 
     res.json({
       habit: toHabitJSON(
         habit,
         pendingMissedDate,
-        lastBrokenDate
+        lastBrokenDate,
+        logDates,
+        current_streak,
+        longest_streak
       ),
     });
   } catch (err) {
+    console.error(
+      "Failed to update habit:",
+      err
+    );
+
     res.status(500).json({
       message: "Failed to update habit",
       error: err.message,
@@ -286,13 +402,13 @@ async function updateHabit(req, res) {
   }
 }
 
-// FR-05: delete habit and its logs
 async function deleteHabit(req, res) {
   try {
-    const habit = await Habit.findOneAndDelete({
-      _id: req.params.id,
-      user_id: req.userId,
-    });
+    const habit =
+      await Habit.findOneAndDelete({
+        _id: req.params.id,
+        user_id: req.userId,
+      });
 
     if (!habit) {
       return res.status(404).json({
@@ -308,6 +424,11 @@ async function deleteHabit(req, res) {
       message: "Habit deleted",
     });
   } catch (err) {
+    console.error(
+      "Failed to delete habit:",
+      err
+    );
+
     res.status(500).json({
       message: "Failed to delete habit",
       error: err.message,
